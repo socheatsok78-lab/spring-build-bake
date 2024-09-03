@@ -28,7 +28,7 @@ WORKDIR ${SPRING_BOOT_BAKE_APPDIR}
 COPY --from=extracted /extracted/dependencies/ ${SPRING_BOOT_BAKE_APPDIR}/dependencies/
 COPY --from=extracted /extracted/snapshot-dependencies/ ${SPRING_BOOT_BAKE_APPDIR}/snapshot-dependencies/
 COPY --from=extracted /extracted/spring-boot-loader/ ${SPRING_BOOT_BAKE_APPDIR}/spring-boot-loader/
-COPY --from=extracted /extracted/application/ ${SPRING_BOOT_BAKE_APPDIR}/application/ß
+COPY --from=extracted /extracted/application/ ${SPRING_BOOT_BAKE_APPDIR}/application/
 
 # Final image for the tools mode
 FROM ${SPRING_BOOT_BAKE_BASE_IMAGE} AS final-tools
