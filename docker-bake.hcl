@@ -11,11 +11,8 @@ variable "SPRING_BOOT_BAKE_APPDIR" {
   default = "/app"
 }
 
-target "default" {
+target "jarmode" {
   context = BAKE_CMD_CONTEXT
-  tags = [
-    "localhost/spring-buildx-bake:${GRADLE_BUILD_ARTIFACT_ID}",
-  ]
   dockerfile-inline = <<EOT
 # Extract the layers
 FROM ${SPRING_BOOT_BAKE_BASE_IMAGE} AS extracted
@@ -41,6 +38,13 @@ COPY --from=extracted /extracted/lib/ ${SPRING_BOOT_BAKE_APPDIR}/lib/
 COPY --from=extracted /extracted/${GRADLE_BUILD_ARTIFACT} ${SPRING_BOOT_BAKE_APPDIR}/
 CMD ["java", "-jar", "${GRADLE_BUILD_ARTIFACT}"]
 
-FROM final-${JARMODE} AS app
+FROM final-${JARMODE} AS jarmode
 EOT
+}
+
+
+target "default" {
+  contexts = {
+    "builder": "target:builder"
+  }
 }
