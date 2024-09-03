@@ -25,18 +25,18 @@ RUN --mount=type=bind,target=/tmp/workdir,rw \
 FROM ${SPRING_BOOT_BAKE_BASE_IMAGE} AS final-layertools
 ENV SPRING_BOOT_BAKE_APPDIR=${SPRING_BOOT_BAKE_APPDIR}
 WORKDIR ${SPRING_BOOT_BAKE_APPDIR}
-COPY --from=extracted /extracted/dependencies/ ./
-COPY --from=extracted /extracted/spring-boot-loader/ ./
-COPY --from=extracted /extracted/snapshot-dependencies/ ./
-COPY --from=extracted /extracted/application/ ./
+COPY --from=extracted /extracted/dependencies/ ${SPRING_BOOT_BAKE_APPDIR}/dependencies/
+COPY --from=extracted /extracted/snapshot-dependencies/ ${SPRING_BOOT_BAKE_APPDIR}/snapshot-dependencies/
+COPY --from=extracted /extracted/spring-boot-loader/ ${SPRING_BOOT_BAKE_APPDIR}/spring-boot-loader/
+COPY --from=extracted /extracted/application/ ${SPRING_BOOT_BAKE_APPDIR}/application/ß
 
 # Final image for the tools mode
 FROM ${SPRING_BOOT_BAKE_BASE_IMAGE} AS final-tools
 ENV SPRING_BOOT_BAKE_APPDIR=${SPRING_BOOT_BAKE_APPDIR}
 ARG GRADLE_BUILD_ARTIFACT
 WORKDIR ${SPRING_BOOT_BAKE_APPDIR}
-COPY --from=extracted /extracted/lib/ ./
-COPY --from=extracted /extracted/${GRADLE_BUILD_ARTIFACT} ./
+COPY --from=extracted /extracted/lib/ ${SPRING_BOOT_BAKE_APPDIR}/lib/
+COPY --from=extracted /extracted/${GRADLE_BUILD_ARTIFACT} ${SPRING_BOOT_BAKE_APPDIR}/
 
 FROM final-${JARMODE} AS app
 EOT
