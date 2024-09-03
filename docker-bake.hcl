@@ -1,5 +1,8 @@
 target "default" {
   context = BAKE_CMD_CONTEXT
+  tags = [
+    "demo:latest"
+  ]
   dockerfile-inline = <<EOT
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
