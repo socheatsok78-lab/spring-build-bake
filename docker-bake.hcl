@@ -14,7 +14,7 @@ variable "SPRING_BOOT_BAKE_APPDIR" {
 target "default" {
   context = BAKE_CMD_CONTEXT
   tags = [
-    "spring-buildx-bake:${GRADLE_BUILD_ARTIFACT_ID}",
+    "localhost/spring-buildx-bake:${GRADLE_BUILD_ARTIFACT_ID}",
   ]
   dockerfile-inline = <<EOT
 # Extract the layers
