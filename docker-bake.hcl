@@ -1,4 +1,5 @@
 variable "GRADLE_BUILD_ARTIFACT" {}
+variable "GRADLE_BUILD_ARTIFACT_ID" {}
 
 variable "JARMODE" {
   default = "layertools"
@@ -13,7 +14,7 @@ variable "SPRING_BOOT_BAKE_APPDIR" {
 target "default" {
   context = BAKE_CMD_CONTEXT
   tags = [
-    "demo:latest"
+    "${GRADLE_BUILD_ARTIFACT_ID}:layered",
   ]
   dockerfile-inline = <<EOT
 # Extract the layers
