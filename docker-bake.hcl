@@ -18,9 +18,8 @@ target "default" {
   dockerfile-inline = <<EOT
 # Extract the layers
 FROM ${SPRING_BOOT_BAKE_BASE_IMAGE} AS extracted
-WORKDIR /extracted
 RUN --mount=type=bind,target=/tmp/workdir,rw \
-    java -Djarmode=${JARMODE} -jar build/libs/${GRADLE_BUILD_ARTIFACT} extract --destination /extracted
+    java -Djarmode=${JARMODE} -jar /tmp/workdir/build/libs/${GRADLE_BUILD_ARTIFACT} extract --destination /extracted
 
 # Final image for the layertools mode
 FROM ${SPRING_BOOT_BAKE_BASE_IMAGE} AS final-layertools
