@@ -1,10 +1,14 @@
+variable "GRADLE_BUILD_ARTIFACT" {}
+
 variable "JARMODE" {
   default = "layertools"
 }
 variable "SPRING_BOOT_BAKE_BASE_IMAGE" {
   default = "eclipse-temurin:17-jre-jammy"
 }
-variable "GRADLE_BUILD_ARTIFACT" {}
+variable "SPRING_BOOT_BAKE_APPDIR" {
+  default = "/app"
+}
 
 target "default" {
   context = BAKE_CMD_CONTEXT
