@@ -1,8 +1,18 @@
+variable "JARMODE" {
+  default = "layertools"
+}
+
+variable "GRADLE_BUILD_ARTIFACT" {}
+
 target "default" {
   context = BAKE_CMD_CONTEXT
   tags = [
     "demo:latest"
   ]
+  args = {
+    JARMODE = "${JARMODE}"
+    GRADLE_BUILD_ARTIFACT = "${GRADLE_BUILD_ARTIFACT}"
+  }
   dockerfile-inline = <<EOT
 ARG JARMODE=layertools
 ARG SPRING_BOOT_BAKE_BASE_IMAGE=eclipse-temurin:17-jre-jammy
