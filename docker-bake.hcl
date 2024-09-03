@@ -1,9 +1,5 @@
 target "default" {
   context = BAKE_CMD_CONTEXT
-  dockerfile = "Dockerfile"
-}
-target "default" {
-  context = BAKE_CMD_CONTEXT
   dockerfile-inline = <<EOT
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
