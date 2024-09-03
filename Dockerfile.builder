@@ -1,1 +1,0 @@
-FROM jarmode AS builder
