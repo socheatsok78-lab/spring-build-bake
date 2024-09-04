@@ -19,7 +19,21 @@ FROM ${SPRING_BOOT_BAKE_BASE_IMAGE} AS extracted
 RUN --mount=type=bind,target=/src,rw \
     java -Djarmode=${JARMODE} -jar /src/build/libs/${GRADLE_BUILD_ARTIFACT} extract --destination /extracted
 
-# Final image for the layertools mode
+# Prepare the image for the tools mode
+FROM ${SPRING_BOOT_BAKE_BASE_IMAGE} AS jarmode-tools
+ENV SPRING_BOOT_BAKE_APPDIR=${SPRING_BOOT_BAKE_APPDIR}
+ENV GRADLE_BUILD_ARTIFACT=${GRADLE_BUILD_ARTIFACT}
+WORKDIR ${SPRING_BOOT_BAKE_APPDIR}
+COPY --from=extracted /extracted/lib/ ${SPRING_BOOT_BAKE_APPDIR}/lib/
+COPY --from=extracted /extracted/${GRADLE_BUILD_ARTIFACT} ${SPRING_BOOT_BAKE_APPDIR}
+COPY <<EOF /java-entrypoint.sh
+#!/bin/sh
+set -e
+exec java "$@" -jar ${GRADLE_BUILD_ARTIFACT}
+EOF
+RUN chmod +x /java-entrypoint.sh
+
+# Prepare the image for the layertools mode
 FROM ${SPRING_BOOT_BAKE_BASE_IMAGE} AS jarmode-layertools
 ENV SPRING_BOOT_BAKE_APPDIR=${SPRING_BOOT_BAKE_APPDIR}
 WORKDIR ${SPRING_BOOT_BAKE_APPDIR}
@@ -27,14 +41,18 @@ COPY --from=extracted /extracted/dependencies/ ${SPRING_BOOT_BAKE_APPDIR}
 COPY --from=extracted /extracted/snapshot-dependencies/ ${SPRING_BOOT_BAKE_APPDIR}
 COPY --from=extracted /extracted/spring-boot-loader/ ${SPRING_BOOT_BAKE_APPDIR}
 COPY --from=extracted /extracted/application/ ${SPRING_BOOT_BAKE_APPDIR}
-
-# Final image for the tools mode
-FROM ${SPRING_BOOT_BAKE_BASE_IMAGE} AS jarmode-tools
-ENV SPRING_BOOT_BAKE_APPDIR=${SPRING_BOOT_BAKE_APPDIR}
-ENV GRADLE_BUILD_ARTIFACT=${GRADLE_BUILD_ARTIFACT}
-WORKDIR ${SPRING_BOOT_BAKE_APPDIR}
-COPY --from=extracted /extracted/lib/ ${SPRING_BOOT_BAKE_APPDIR}/lib/
-COPY --from=extracted /extracted/${GRADLE_BUILD_ARTIFACT} ${SPRING_BOOT_BAKE_APPDIR}/
+COPY <<EOF /java-entrypoint.sh
+#!/bin/sh
+set -e
+if [ ! -f "META-INF/MANIFEST.MF" ]; then
+    echo "[ERROR] The application is missing the META-INF/MANIFEST.MF file."
+    exit 1
+fi
+SPRING_BOOT_MAIN_CLASS=$(grep Main-Class META-INF/MANIFEST.MF | cut -d ' ' -f 2 | tr -d '\r')
+SPRING_BOOT_LAUNCHER=$${SPRING_BOOT_LAUNCHER:-$${SPRING_BOOT_MAIN_CLASS:-org.springframework.boot.loader.JarLauncher}}
+exec java "$@" "$SPRING_BOOT_LAUNCHER"
+EOF
+RUN chmod +x /java-entrypoint.sh
 
 FROM jarmode-${JARMODE} AS app
 EOT
