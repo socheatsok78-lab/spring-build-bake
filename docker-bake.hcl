@@ -26,11 +26,7 @@ ENV GRADLE_BUILD_ARTIFACT=${GRADLE_BUILD_ARTIFACT}
 WORKDIR ${SPRING_BOOT_BAKE_APPDIR}
 COPY --from=extracted /extracted/lib/ ${SPRING_BOOT_BAKE_APPDIR}/lib/
 COPY --from=extracted /extracted/${GRADLE_BUILD_ARTIFACT} ${SPRING_BOOT_BAKE_APPDIR}
-COPY <<EOF /java-entrypoint.sh
-#!/bin/sh
-set -e
-exec java "$@" -jar ${GRADLE_BUILD_ARTIFACT}
-EOF
+ADD https://gist.githubusercontent.com/socheatsok78/631383c2c4a9c68d3689be10aa8b1b02/raw/c4f6b990dbbb0d968ed38d68751dc487b326c710/tools-entrypoint.sh /java-entrypoint.sh
 RUN chmod +x /java-entrypoint.sh
 
 # Prepare the image for the layertools mode
@@ -41,17 +37,7 @@ COPY --from=extracted /extracted/dependencies/ ${SPRING_BOOT_BAKE_APPDIR}
 COPY --from=extracted /extracted/snapshot-dependencies/ ${SPRING_BOOT_BAKE_APPDIR}
 COPY --from=extracted /extracted/spring-boot-loader/ ${SPRING_BOOT_BAKE_APPDIR}
 COPY --from=extracted /extracted/application/ ${SPRING_BOOT_BAKE_APPDIR}
-COPY <<EOF /java-entrypoint.sh
-#!/bin/sh
-set -e
-if [ ! -f "META-INF/MANIFEST.MF" ]; then
-    echo "[ERROR] The application is missing the META-INF/MANIFEST.MF file."
-    exit 1
-fi
-SPRING_BOOT_MAIN_CLASS=$(grep Main-Class META-INF/MANIFEST.MF | cut -d ' ' -f 2 | tr -d '\r')
-SPRING_BOOT_LAUNCHER=$${SPRING_BOOT_LAUNCHER:-$${SPRING_BOOT_MAIN_CLASS:-org.springframework.boot.loader.JarLauncher}}
-exec java "$$@" "$$SPRING_BOOT_LAUNCHER"
-EOF
+ADD https://gist.githubusercontent.com/socheatsok78/631383c2c4a9c68d3689be10aa8b1b02/raw/c4f6b990dbbb0d968ed38d68751dc487b326c710/layertools-entrypoint.sh /java-entrypoint.sh
 RUN chmod +x /java-entrypoint.sh
 
 FROM jarmode-${JARMODE} AS app
