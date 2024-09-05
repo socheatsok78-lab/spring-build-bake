@@ -14,7 +14,7 @@ target "default" {
   context = BAKE_CMD_CONTEXT
   dockerfile-inline = <<EOT
 # Extract Spring Boot application layers using jarmode=tools
-FROM ${SPRING_BOOT_BAKE_BASE_IMAGE} AS jarmode-tools
+FROM ${SPRING_BOOT_BAKE_BASE_IMAGE} AS layered-tools
 ARG SPRING_BOOT_BAKE_APPDIR
 ARG GRADLE_BUILD_ARTIFACT
 RUN --mount=type=bind,target=/src,rw \
@@ -22,7 +22,7 @@ RUN --mount=type=bind,target=/src,rw \
 
 # Extract Spring Boot application layers using jarmode=layertools
 # Note: the jarmode=layertools is being deprecated in favor of jarmode=tools
-FROM ${SPRING_BOOT_BAKE_BASE_IMAGE} AS jarmode-layertools
+FROM ${SPRING_BOOT_BAKE_BASE_IMAGE} AS layered-layertools
 ARG SPRING_BOOT_BAKE_APPDIR
 ARG GRADLE_BUILD_ARTIFACT
 RUN --mount=type=bind,target=/src,rw \
