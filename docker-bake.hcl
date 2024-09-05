@@ -32,7 +32,7 @@ RUN --mount=type=bind,target=/src,rw \
 FROM layered-${JARMODE} AS layered
 
 # Final image with the Spring Boot application layers
-FROM jarmode-${JARMODE}
+FROM ${SPRING_BOOT_BAKE_BASE_IMAGE}
 ARG GRADLE_BUILD_ARTIFACT
 ENV GRADLE_BUILD_ARTIFACT=${GRADLE_BUILD_ARTIFACT}
 ARG SPRING_BOOT_BAKE_APPDIR
