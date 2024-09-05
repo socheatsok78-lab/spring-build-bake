@@ -17,7 +17,10 @@ target "default" {
 # Extract the layers
 FROM ${SPRING_BOOT_BAKE_BASE_IMAGE} AS extracted
 RUN --mount=type=bind,target=/src,rw \
-    java -Djarmode=tools -jar /src/build/libs/${GRADLE_BUILD_ARTIFACT} extract --layers --launcher --destination /extracted
+<<EOF
+  java -Djarmode=tools -jar /src/build/libs/${GRADLE_BUILD_ARTIFACT} extract --layers --launcher --destination /extracted
+  ls -la /extracted
+EOF
 
 # Prepare the image for the layertools mode
 FROM ${SPRING_BOOT_BAKE_BASE_IMAGE}
